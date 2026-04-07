@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use Illuminate\Http\Request;
+
+class OrderController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Order::with('user')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
+
+        return view('admin.orders.index', compact('orders'));
+    }
+
+    public function show(Order $order)
+    {
+        $order->load('user', 'items.book', 'paymentProof.user');
+        return view('admin.orders.show', compact('order'));
+    }
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status'           => 'required|in:pending,confirmed,shipped,completed,cancelled',
+            'tracking_number'  => 'nullable|string|max:100',
+            'shipping_courier' => 'nullable|string|max:50',
+        ]);
+
+        $data = ['status' => $request->status];
+
+        if ($request->status === 'shipped') {
+            $data['shipped_at'] = now();
+            $data['tracking_number'] = $request->tracking_number;
+            $data['shipping_courier'] = $request->shipping_courier;
+        }
+
+        if ($request->status === 'completed') {
+            $data['completed_at'] = now();
+        }
+
+        $order->update($data);
+
+        return back()->with('success', 'Status pesanan berhasil diperbarui.');
+    }
+}
