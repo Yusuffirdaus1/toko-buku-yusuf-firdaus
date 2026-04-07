@@ -31,11 +31,11 @@
                         <td>{!! $order->status_badge !!}</td>
                         <td>
                             @if($order->status === 'completed')
-                                <span class="badge bg-success">Lunas (COD)</span>
+                                <span class="badge bg-success">Lunas (QRIS)</span>
                             @elseif($order->status === 'cancelled')
                                 <span class="badge bg-danger">Batal</span>
                             @else
-                                <span class="badge bg-warning text-dark">Belum Lunas (COD)</span>
+                                <span class="badge bg-warning text-dark">Belum Lunas (QRIS)</span>
                             @endif
                         </td>
                         <td class="text-muted small">{{ $order->created_at->format('d M Y') }}</td>

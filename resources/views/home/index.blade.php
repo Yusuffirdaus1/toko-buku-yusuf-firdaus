@@ -110,10 +110,10 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4 h-100 p-4 text-center" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div class="d-inline-flex justify-content-center align-items-center mb-4" style="width: 70px; height: 70px; background: #ecfdf5; border-radius: 50%;">
-                    <i class="bi bi-truck text-success" style="font-size: 2rem;"></i>
+                    <i class="bi bi-qr-code-scan text-success" style="font-size: 2rem;"></i>
                 </div>
-                <h5 class="fw-bold mb-3">Sistem COD Tersedia</h5>
-                <p class="text-muted mb-0">Tidak punya E-Wallet atau Rekening? Kami mendukung penuh layanan Cash on Delivery (COD). Bayar langsung ke kurir saat paket tiba!</p>
+                <h5 class="fw-bold mb-3">Sistem Pembayaran QRIS</h5>
+                <p class="text-muted mb-0">Kemudahan transaksi di ujung jari Anda. Kami mendukung penuh pembayaran instan dan aman menggunakan kode QRIS secara praktis!</p>
             </div>
         </div>
         <div class="col-md-4">

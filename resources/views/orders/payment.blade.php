@@ -9,11 +9,14 @@
                 <h5 class="fw-bold mb-1"><i class="bi bi-upload me-2"></i>Upload Bukti Pembayaran</h5>
                 <p class="text-muted small mb-4">Pesanan #{{ $order->id }} — Total: {{ $order->formatted_total }}</p>
 
-                <div class="alert alert-info rounded-3 small">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <strong>Rekening Pembayaran:</strong><br>
-                    BCA: <strong>1234567890</strong> a.n. Toko Buku Yusuf Firdaus<br>
-                    BRI: <strong>0987654321</strong> a.n. Toko Buku Yusuf Firdaus
+                <div class="text-center mb-4">
+                    <div class="alert alert-info rounded-3 small mb-3 text-start">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Silakan scan kode QRIS di bawah ini dengan aplikasi Mobile Banking atau e-Wallet Anda (Gopay, Ovo, Dana, ShopeePay, dll).
+                    </div>
+                    <img src="{{ asset('images/qris.jpg') }}" alt="QRIS Toko Buku Yusuf Firdaus" class="img-fluid rounded-3 shadow-sm border" style="max-width: 300px;">
+                    <p class="mt-3 fw-bold mb-0">CUPSTORE, ELEKTRONIK</p>
+                    <p class="text-muted small">NMID: ID1026481314700</p>
                 </div>
 
                 <form action="{{ route('orders.payment.upload', $order) }}" method="POST" enctype="multipart/form-data">

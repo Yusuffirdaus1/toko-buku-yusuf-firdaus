@@ -45,14 +45,14 @@
                     <div class="mb-4">
                         <label class="form-label fw-semibold small">Metode Pembayaran</label>
                         <div class="alert alert-info py-3 mb-0 rounded-3">
-                            <h6 class="fw-bold mb-1"><i class="bi bi-wallet2 me-2"></i>Cash on Delivery (COD)</h6>
-                            <small>Pembayaran dilakukan secara langsung kepada kurir saat pesanan tiba di alamat Anda.</small>
-                            <input type="hidden" name="payment_method" value="COD">
+                            <h6 class="fw-bold mb-1"><i class="bi bi-qr-code-scan me-2"></i>QRIS</h6>
+                            <small>Silakan lakukan pembayaran dengan memindai barcode QRIS pada halaman selanjutnya.</small>
+                            <input type="hidden" name="payment_method" value="QRIS">
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary-custom w-100 py-2 fw-semibold"
-                            onclick="return confirm('Konfirmasi pesanan dengan metode pembayaran di tempat (COD)?')">
-                        <i class="bi bi-bag-check me-2"></i>Buat Pesanan
+                            onclick="return confirm('Konfirmasi pesanan dan lanjutkan ke pembayaran QRIS?')">
+                        <i class="bi bi-bag-check me-2"></i>Buat Pesanan & Bayar
                     </button>
                 </form>
             </div>

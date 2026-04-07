@@ -246,6 +246,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('books.*') ? 'active' : '' }}" href="{{ route('books.index') }}">Katalog Buku</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('contact.*') ? 'active' : '' }}" href="{{ route('contact.index') }}">Hubungi Kami</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav align-items-center gap-1">
@@ -344,6 +347,7 @@
                 <ul class="list-unstyled" style="font-size: 0.88rem;">
                     <li class="mb-1"><a href="{{ route('home') }}">Beranda</a></li>
                     <li class="mb-1"><a href="{{ route('books.index') }}">Katalog</a></li>
+                    <li class="mb-1"><a href="{{ route('contact.index') }}">Hubungi Kami</a></li>
                 </ul>
             </div>
             <div class="col-md-3">

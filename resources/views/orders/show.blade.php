@@ -118,8 +118,17 @@
 
             @if($order->status === 'pending' || $order->status === 'confirmed')
                 <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4" style="background-color: #e0f2fe; color: #0284c7;">
-                    <h6 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Instruksi COD (Bayar di Tempat)</h6>
-                    <p class="mb-0" style="font-size: 0.9rem;">Admin kami sedang menyiapkan buku pesanan Anda. Karena Anda menggunakan metode COD, pastikan Anda menyiapkan uang tunai sebesar <strong>{{ $order->formatted_total }}</strong> untuk diberikan kepada kurir saat paket tiba di alamat Anda.</p>
+                    <h6 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Instruksi Pembayaran QRIS</h6>
+                    @if($order->status === 'pending')
+                        <p class="mb-0" style="font-size: 0.9rem;">Silakan lakukan pembayaran sebesar <strong>{{ $order->formatted_total }}</strong> menggunakan kode QRIS toko kami.</p>
+                        @if(!$order->paymentProof)
+                           <a href="{{ route('orders.payment', $order) }}" class="btn btn-sm btn-primary mt-3 rounded-pill px-3 shadow-sm"><i class="bi bi-upload me-1"></i> Unggah Bukti Pembayaran</a>
+                        @else
+                           <p class="mb-0 mt-2 fw-semibold text-success"><i class="bi bi-check2-circle me-1"></i> Bukti pembayaran telah diunggah, menunggu konfirmasi admin.</p>
+                        @endif
+                    @elseif($order->status === 'confirmed')
+                        <p class="mb-0" style="font-size: 0.9rem;">Pembayaran QRIS Anda telah berhasil kami konfirmasi! Saat ini admin kami sedang menyiapkan buku pesanan Anda untuk segera dikemas dan dikirim ke alamat Anda.</p>
+                    @endif
                 </div>
             @endif
 
@@ -130,11 +139,11 @@
                             <i class="bi bi-box2-heart text-success" style="font-size: 2rem;"></i>
                         </div>
                         <h6 class="fw-bold text-success mb-2">Paket Sedang Dalam Perjalanan!</h6>
-                        <p class="text-muted small mb-4" style="max-width: 400px; margin: 0 auto;">Kurir sedang menuju alamat Anda. Harap siapkan uang tunai Anda. Jika paket sudah tiba di tangan Anda dan pembayaran telah selesai, silakan tekan tombol konfirmasi di bawah ini.</p>
+                        <p class="text-muted small mb-4" style="max-width: 400px; margin: 0 auto;">Kurir sedang menuju alamat Anda. Jika paket sudah tiba di tangan Anda dengan kondisi baik, silakan tekan tombol konfirmasi di bawah ini.</p>
                         
                         <form action="{{ route('orders.complete', $order) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow-sm" onclick="return confirm('Apakah Anda yakin paket sudah diterima dengan baik dan pembayaran telah diserahkan ke kurir?')">
+                            <button type="submit" class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow-sm" onclick="return confirm('Apakah Anda yakin paket sudah diterima dengan baik?')">
                                 <i class="bi bi-check-circle-fill me-2"></i>Pesanan Sudah Saya Terima
                             </button>
                         </form>

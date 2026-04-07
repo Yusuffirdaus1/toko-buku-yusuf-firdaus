@@ -83,7 +83,7 @@ class OrderController extends Controller
                 'status'           => 'pending',
                 'address'          => $request->address,
                 'phone'            => $request->phone,
-                'payment_method'   => 'COD',
+                'payment_method'   => 'QRIS',
                 'shipping_courier' => $request->shipping_courier,
             ]);
 
@@ -105,7 +105,7 @@ class OrderController extends Controller
             return $createdOrder;
         });
 
-        return redirect()->route('orders.show', $order)->with('success', 'Pesanan berhasil dibuat! Barang akan dikirim dan Pembayaran (COD) dilakukan saat paket tiba.');
+        return redirect()->route('orders.payment', $order)->with('success', 'Pesanan berhasil dibuat! Silakan scan QRIS dan unggah bukti pembayaran.');
     }
 
     /**
