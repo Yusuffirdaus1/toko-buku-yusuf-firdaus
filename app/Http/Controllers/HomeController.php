@@ -10,8 +10,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $mainCarousels = Carousel::where('type', 'main')->where('is_active', true)->orderBy('order')->get();
-        $promoCarousels = Carousel::where('type', 'promo')->where('is_active', true)->orderBy('order')->get();
+        $mainCarousels = Carousel::where('type', 'main')->where('is_active', true)->orderBy('order')->latest()->get();
+        $promoCarousels = Carousel::where('type', 'promo')->where('is_active', true)->orderBy('order')->latest()->get();
         $featuredBooks = Book::with('category')->where('stock', '>', 0)->latest()->take(8)->get();
         $categories = Category::withCount('books')->get();
 

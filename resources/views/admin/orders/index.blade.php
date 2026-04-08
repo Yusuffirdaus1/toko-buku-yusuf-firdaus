@@ -30,7 +30,7 @@
                         <td class="fw-semibold">{{ $order->formatted_total }}</td>
                         <td>{!! $order->status_badge !!}</td>
                         <td>
-                            @if($order->status === 'completed')
+                            @if(in_array($order->status, ['confirmed', 'shipped', 'completed']))
                                 <span class="badge bg-success">Lunas (QRIS)</span>
                             @elseif($order->status === 'cancelled')
                                 <span class="badge bg-danger">Batal</span>

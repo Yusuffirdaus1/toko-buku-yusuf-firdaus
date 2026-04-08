@@ -3,9 +3,12 @@
 @section('page-title','Detail Pesanan')
 
 @section('content')
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center">
     <h4>Pesanan #{{ $order->id }} — {{ $order->user->name }}</h4>
-    <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary rounded-3"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+    <div>
+        <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" class="btn btn-outline-primary rounded-3 me-2"><i class="bi bi-printer me-1"></i>Cetak Invoice</a>
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary rounded-3"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+    </div>
 </div>
 
 <div class="row g-4">

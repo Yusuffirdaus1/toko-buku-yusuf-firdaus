@@ -12,13 +12,13 @@
             @if($mainCarousels->isNotEmpty())
             <div id="heroCarousel" class="carousel slide h-100" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
                 <div class="carousel-indicators">
-                    @foreach($mainCarousels as $i => $banner)
-                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}"></button>
+                    @foreach($mainCarousels as $banner)
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></button>
                     @endforeach
                 </div>
                 <div class="carousel-inner h-100">
-                    @foreach($mainCarousels as $i => $banner)
-                        <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}">
+                    @foreach($mainCarousels as $banner)
+                        <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
                             <div style="position: relative; width: 100%; height: clamp(250px, 30vw, 350px);">
                                 <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%); z-index: 1;"></div>
                                 <img src="{{ $banner->image_url }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="{{ $banner->title }}">

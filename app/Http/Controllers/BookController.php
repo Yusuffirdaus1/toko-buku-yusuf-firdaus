@@ -34,8 +34,8 @@ class BookController extends Controller
         $books = $query->latest()->paginate(12)->withQueryString();
         $categories = Category::all();
 
-        $mainCarousels = Carousel::where('type', 'main')->where('is_active', true)->orderBy('order')->get();
-        $promoCarousels = Carousel::where('type', 'promo')->where('is_active', true)->orderBy('order')->get();
+        $mainCarousels = Carousel::where('type', 'main')->where('is_active', true)->orderBy('order')->latest()->get();
+        $promoCarousels = Carousel::where('type', 'promo')->where('is_active', true)->orderBy('order')->latest()->get();
 
         return view('books.index', compact('books', 'categories', 'mainCarousels', 'promoCarousels'));
     }

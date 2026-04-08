@@ -6,17 +6,17 @@
 <div class="container mt-4">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
     <div class="carousel-indicators">
-        @forelse($mainCarousels as $i => $banner)
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}"
-                class="{{ $i === 0 ? 'active' : '' }}"></button>
+        @forelse($mainCarousels as $banner)
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}"
+                class="{{ $loop->first ? 'active' : '' }}"></button>
         @empty
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
         @endforelse
     </div>
 
     <div class="carousel-inner">
-        @forelse($mainCarousels as $i => $banner)
-            <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+        @forelse($mainCarousels as $banner)
+            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                 <div style="position: relative; width: 100%; height: clamp(250px, 40vw, 450px);">
                     <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%); z-index: 1;"></div>
                     <img src="{{ $banner->image_url }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="{{ $banner->title }}">

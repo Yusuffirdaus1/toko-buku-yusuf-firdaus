@@ -34,7 +34,7 @@ class CarouselController extends Controller
 
         $data = $request->except('image_path');
         $data['image_path'] = $request->file('image_path')->store('carousels', 'public');
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
 
         Carousel::create($data);
 
