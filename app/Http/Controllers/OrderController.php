@@ -48,7 +48,8 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'address'          => 'required|string|max:500',
+            'payment_method'   => 'required|in:QRIS,Kasir',
+            'address'          => 'required_if:payment_method,QRIS|nullable|string|max:500',
             'phone'            => 'required|string|max:20',
             'shipping_courier' => 'nullable|string|max:50',
         ]);
@@ -77,14 +78,17 @@ class OrderController extends Controller
         $total = $cartItems->sum(fn($item) => $item->quantity * $item->book->price);
 
         $order = DB::transaction(function () use ($request, $cartItems, $total, $cartIds) {
+            $isPos = $request->payment_method === 'Kasir';
+            
             $createdOrder = Order::create([
                 'user_id'          => auth()->id(),
                 'total'            => $total,
                 'status'           => 'pending',
-                'address'          => $request->address,
+                'address'          => $isPos ? 'Ambil di Toko / Bayar di Kasir' : $request->address,
                 'phone'            => $request->phone,
-                'payment_method'   => 'QRIS',
-                'shipping_courier' => $request->shipping_courier,
+                'payment_method'   => $request->payment_method,
+                'sale_type'        => $isPos ? 'pos' : 'online',
+                'shipping_courier' => $isPos ? 'Bawa Sendiri' : $request->shipping_courier,
             ]);
 
             foreach ($cartItems as $item) {
@@ -105,7 +109,17 @@ class OrderController extends Controller
             return $createdOrder;
         });
 
-        return redirect()->route('orders.payment', $order)->with('success', 'Pesanan berhasil dibuat! Silakan scan QRIS dan unggah bukti pembayaran.');
+        if ($order->payment_method === 'Kasir') {
+            return redirect()->route('orders.show', $order)
+                ->with('success', 'Pesanan berhasil dibuat! Silakan tunjukkan Invoice ini ke Kasir untuk pembayaran.');
+        }
+
+        return redirect()->route('orders.payment', $order)
+            ->with('order_success', [
+                'order_id' => $order->id,
+                'total' => $order->formatted_total
+            ])
+            ->with('success', 'Pesanan berhasil dibuat! Silakan scan QRIS dan unggah bukti pembayaran.');
     }
 
     /**
@@ -131,7 +145,8 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->user_id !== auth()->id())
+            abort(403);
         $order->load('items.book', 'paymentProof');
 
         return view('orders.show', compact('order'));
@@ -145,7 +160,8 @@ class OrderController extends Controller
      */
     public function paymentForm(Order $order)
     {
-        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->user_id !== auth()->id())
+            abort(403);
 
         if ($order->paymentProof) {
             return redirect()->route('orders.show', $order)->with('info', 'Bukti pembayaran sudah dikirim.');
@@ -163,7 +179,8 @@ class OrderController extends Controller
      */
     public function uploadPayment(Request $request, Order $order)
     {
-        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->user_id !== auth()->id())
+            abort(403);
 
         $request->validate([
             'proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -172,14 +189,33 @@ class OrderController extends Controller
         $path = $request->file('proof')->store('payment-proofs', 'public');
 
         PaymentProof::create([
-            'order_id'  => $order->id,
-            'user_id'   => auth()->id(),
+            'order_id' => $order->id,
+            'user_id' => auth()->id(),
             'file_path' => $path,
-            'status'    => 'pending',
+            'status' => 'pending',
         ]);
 
         return redirect()->route('orders.show', $order)
+            ->with('payment_success', [
+                'order_id' => $order->id,
+                'total' => $order->formatted_total
+            ])
             ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi admin.');
+    }
+
+    /**
+     * Tampilin invoice/struk pembayaran untuk pesanan milik user.
+     *
+     * @param  \App\Models\Order  $order
+     * @return \Illuminate\View\View
+     */
+    public function invoice(Order $order)
+    {
+        if ($order->user_id !== auth()->id())
+            abort(403);
+        $order->load('user', 'items.book');
+
+        return view('orders.invoice', compact('order'));
     }
 
     /**
@@ -190,7 +226,8 @@ class OrderController extends Controller
      */
     public function complete(Order $order)
     {
-        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->user_id !== auth()->id())
+            abort(403);
 
         if ($order->status !== 'shipped') {
             return back()->with('error', 'Status pesanan tidak dapat diubah menjadi selesai pada tahap ini.');

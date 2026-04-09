@@ -39,6 +39,7 @@ class OrderController extends Controller
             'status'           => 'required|in:pending,confirmed,shipped,completed,cancelled',
             'tracking_number'  => 'nullable|string|max:100',
             'shipping_courier' => 'nullable|string|max:50',
+            'amount_paid'      => 'nullable|numeric|min:0',
         ]);
 
         $data = ['status' => $request->status];
@@ -47,6 +48,12 @@ class OrderController extends Controller
             $data['shipped_at'] = now();
             $data['tracking_number'] = $request->tracking_number;
             $data['shipping_courier'] = $request->shipping_courier;
+        }
+
+        // Handle cash payment for Kasir method
+        if ($request->filled('amount_paid')) {
+            $data['amount_paid'] = $request->amount_paid;
+            $data['change_amount'] = max(0, $request->amount_paid - $order->total);
         }
 
         if ($request->status === 'completed') {

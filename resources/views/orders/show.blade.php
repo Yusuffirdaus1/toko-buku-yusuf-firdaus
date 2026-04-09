@@ -12,7 +12,7 @@
     </div>
 
     {{-- Progress Tracker --}}
-    @if($order->status !== 'cancelled')
+    @if($order->status !== 'cancelled' && $order->payment_method !== 'Kasir')
     <div class="card border-0 rounded-4 p-4 mb-4 shadow-sm" style="background-color: #f0f7ff;">
         <h6 class="text-primary fw-bold mb-4"><i class="bi bi-clock-history me-2"></i>Progress Transaksi</h6>
         
@@ -94,94 +94,172 @@
     </div>
     @endif
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h6 class="fw-bold mb-3">Item Pesanan</h6>
-                @foreach($order->items as $item)
-                    <div class="d-flex gap-3 mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
-                        <img src="{{ $item->book->cover_url }}" width="55" height="70"
-                             style="object-fit: cover; border-radius: 8px;" alt="">
-                        <div class="flex-grow-1">
-                            <p class="fw-semibold mb-0">{{ $item->book->title }}</p>
-                            <small class="text-muted">{{ $item->book->author }}</small>
-                            <p class="mt-1 mb-0 small">{{ $item->quantity }} × Rp {{ number_format($item->price, 0, ',', '.') }}</p>
-                        </div>
-                        <span class="fw-bold text-primary">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+    @if($order->payment_method === 'Kasir' && $order->status === 'pending')
+        {{-- Tampilan Tiket Kasir Khusus --}}
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-lg rounded-5 overflow-hidden text-center mb-5">
+                    <div class="card-header bg-primary py-4 text-white border-0">
+                        <i class="bi bi-shop fs-1"></i>
+                        <h4 class="fw-bold mt-2 mb-0">Tiket Pembayaran Kasir</h4>
                     </div>
-                @endforeach
-                <div class="d-flex justify-content-between fw-bold pt-2 border-top mt-2">
-                    <span>Total</span>
-                    <span class="text-primary">{{ $order->formatted_total }}</span>
-                </div>
-            </div>
-
-            @if($order->status === 'pending' || $order->status === 'confirmed')
-                <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4" style="background-color: #e0f2fe; color: #0284c7;">
-                    <h6 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Instruksi Pembayaran QRIS</h6>
-                    @if($order->status === 'pending')
-                        <p class="mb-0" style="font-size: 0.9rem;">Silakan lakukan pembayaran sebesar <strong>{{ $order->formatted_total }}</strong> menggunakan kode QRIS toko kami.</p>
-                        @if(!$order->paymentProof)
-                           <a href="{{ route('orders.payment', $order) }}" class="btn btn-sm btn-primary mt-3 rounded-pill px-3 shadow-sm"><i class="bi bi-upload me-1"></i> Unggah Bukti Pembayaran</a>
-                        @else
-                           <p class="mb-0 mt-2 fw-semibold text-success"><i class="bi bi-check2-circle me-1"></i> Bukti pembayaran telah diunggah, menunggu konfirmasi admin.</p>
-                        @endif
-                    @elseif($order->status === 'confirmed')
-                        <p class="mb-0" style="font-size: 0.9rem;">Pembayaran QRIS Anda telah berhasil kami konfirmasi! Saat ini admin kami sedang menyiapkan buku pesanan Anda untuk segera dikemas dan dikirim ke alamat Anda.</p>
-                    @endif
-                </div>
-            @endif
-
-            @if($order->status === 'shipped')
-                <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: #ecfdf5; border: 1px solid #10b981 !important;">
-                    <div class="card-body p-4 text-center">
-                        <div class="d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; background: #d1fae5; border-radius: 50%;">
-                            <i class="bi bi-box2-heart text-success" style="font-size: 2rem;"></i>
-                        </div>
-                        <h6 class="fw-bold text-success mb-2">Paket Sedang Dalam Perjalanan!</h6>
-                        <p class="text-muted small mb-4" style="max-width: 400px; margin: 0 auto;">Kurir sedang menuju alamat Anda. Jika paket sudah tiba di tangan Anda dengan kondisi baik, silakan tekan tombol konfirmasi di bawah ini.</p>
+                    <div class="card-body p-5">
+                        <p class="text-muted mb-4">Silakan tunjukkan kode pesanan di bawah ini ke petugas kasir Toko Buku Yusuf Firdaus untuk melakukan pembayaran.</p>
                         
-                        <form action="{{ route('orders.complete', $order) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow-sm" onclick="return confirm('Apakah Anda yakin paket sudah diterima dengan baik?')">
-                                <i class="bi bi-check-circle-fill me-2"></i>Pesanan Sudah Saya Terima
-                            </button>
-                        </form>
+                        <div class="bg-light rounded-4 py-4 mb-4 border-dashed" style="border: 2px dashed #cbd5e1;">
+                            <span class="text-muted small d-block mb-1">KODE PESANAN:</span>
+                            <h1 class="display-3 fw-bold text-dark mb-0 ls-1">#{{ $order->id }}</h1>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center bg-primary-subtle p-3 rounded-4 mb-4">
+                            <span class="fw-bold text-primary">Total Pembayaran:</span>
+                            <h4 class="fw-bold text-primary mb-0">{{ $order->formatted_total }}</h4>
+                        </div>
+
+                        <div class="text-start mb-4">
+                            <h6 class="fw-bold mb-3 small text-muted"><i class="bi bi-list-check me-2"></i>Rincian Buku:</h6>
+                            @foreach($order->items as $item)
+                                <div class="d-flex justify-content-between mb-2 small">
+                                    <span class="text-truncate" style="max-width: 200px;">{{ $item->book->title }} ({{ $item->quantity }}x)</span>
+                                    <span class="fw-semibold">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary py-3 rounded-pill fw-bold">
+                                <i class="bi bi-arrow-left me-2"></i>Kembali ke Daftar Pesanan
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light py-3 border-0">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Tiket ini otomatis akan terhapus jika sudah dibayar.</small>
                     </div>
                 </div>
-            @endif
-
-            @if($order->status === 'completed')
-                <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center gap-3">
-                    <i class="bi bi-patch-check-fill fs-1 text-success"></i>
-                    <div>
-                        <h6 class="fw-bold mb-1">Transaksi Selesai</h6>
-                        <p class="mb-0" style="font-size: 0.9rem;">Terima kasih telah berbelanja di Toko Buku Yusuf Firdaus! Kami tunggu pesanan Anda selanjutnya.</p>
-                    </div>
-                </div>
-            @endif
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h6 class="fw-bold mb-3">Info Pengiriman</h6>
-                <table class="table table-sm table-borderless">
-                    <tr><td class="text-muted small">Alamat</td><td class="small fw-semibold">{{ $order->address }}</td></tr>
-                    <tr><td class="text-muted small">Telepon</td><td class="small fw-semibold">{{ $order->phone }}</td></tr>
-                    <tr><td class="text-muted small">Pembayaran</td><td class="small fw-semibold">{{ strtoupper($order->payment_method) }}</td></tr>
-                    @if($order->shipping_courier)
-                        <tr><td class="text-muted small">Kurir</td><td class="small fw-semibold">{{ $order->shipping_courier }}</td></tr>
-                    @endif
-                    @if($order->tracking_number)
-                        <tr><td class="text-muted small">No. Resi</td><td class="small fw-semibold">{{ $order->tracking_number }}</td></tr>
-                    @endif
-                    @if($order->shipped_at)
-                        <tr><td class="text-muted small">Dikirim</td><td class="small fw-semibold">{{ $order->shipped_at->format('d M Y') }}</td></tr>
-                    @endif
-                    <tr><td class="text-muted small">Tanggal Order</td><td class="small fw-semibold">{{ $order->created_at->format('d M Y H:i') }}</td></tr>
-                </table>
             </div>
         </div>
-    </div>
+    @else
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h6 class="fw-bold mb-3">Item Pesanan</h6>
+                    @foreach($order->items as $item)
+                        <div class="d-flex gap-3 mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
+                            <img src="{{ $item->book->cover_url }}" width="55" height="70"
+                                 style="object-fit: cover; border-radius: 8px;" alt="">
+                            <div class="flex-grow-1">
+                                <p class="fw-semibold mb-0">{{ $item->book->title }}</p>
+                                <small class="text-muted">{{ $item->book->author }}</small>
+                                <p class="mt-1 mb-0 small">{{ $item->quantity }} × Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                            </div>
+                            <span class="fw-bold text-primary">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                        </div>
+                    @endforeach
+                    <div class="d-flex justify-content-between fw-bold pt-2 border-top mt-2">
+                        <span>Total</span>
+                        <span class="text-primary">{{ $order->formatted_total }}</span>
+                    </div>
+                </div>
+
+                {{-- Tombol Invoice / Struk Pembayaran --}}
+                @if($order->status !== 'cancelled')
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="border-left: 4px solid #4f46e5 !important;">
+                        <div class="card-body p-4 d-flex align-items-center gap-3">
+                            <div class="d-flex justify-content-center align-items-center flex-shrink-0" style="width: 50px; height: 50px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 14px;">
+                                <i class="bi bi-receipt-cutoff" style="font-size: 1.5rem; color: #4f46e5;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">Invoice & Struk Pembayaran</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.78rem;">Lihat dan cetak struk digital pesanan ini.</p>
+                            </div>
+                            <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="btn btn-sm fw-semibold rounded-pill px-3 shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #3730a3); color: #fff; font-size: 0.8rem;">
+                                <i class="bi bi-printer me-1"></i> Lihat Struk
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
+                @if($order->payment_method === 'QRIS' && ($order->status === 'pending' || $order->status === 'confirmed'))
+                    <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4" style="background-color: #e0f2fe; color: #0284c7;">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Instruksi Pembayaran QRIS</h6>
+                        @if($order->status === 'pending')
+                            <p class="mb-0" style="font-size: 0.9rem;">Silakan lakukan pembayaran sebesar <strong>{{ $order->formatted_total }}</strong> menggunakan kode QRIS toko kami.</p>
+                            @if(!$order->paymentProof)
+                            <a href="{{ route('orders.payment', $order) }}" class="btn btn-sm btn-primary mt-3 rounded-pill px-3 shadow-sm"><i class="bi bi-upload me-1"></i> Unggah Bukti Pembayaran</a>
+                            @else
+                            <p class="mb-0 mt-2 fw-semibold text-success"><i class="bi bi-check2-circle me-1"></i> Bukti pembayaran telah diunggah, menunggu konfirmasi admin.</p>
+                            @endif
+                        @elseif($order->status === 'confirmed')
+                            <p class="mb-0" style="font-size: 0.9rem;">Pembayaran QRIS Anda telah berhasil kami konfirmasi! Saat ini admin kami sedang menyiapkan buku pesanan Anda untuk segera dikemas dan dikirim ke alamat Anda.</p>
+                        @endif
+                    </div>
+                @endif
+
+                @if($order->status === 'shipped')
+                    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: #ecfdf5; border: 1px solid #10b981 !important;">
+                        <div class="card-body p-4 text-center">
+                            <div class="d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; background: #d1fae5; border-radius: 50%;">
+                                <i class="bi bi-box2-heart text-success" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-bold text-success mb-2">Paket Sedang Dalam Perjalanan!</h6>
+                            <p class="text-muted small mb-4" style="max-width: 400px; margin: 0 auto;">Kurir sedang menuju alamat Anda. Jika paket sudah tiba di tangan Anda dengan kondisi baik, silakan tekan tombol konfirmasi di bawah ini.</p>
+                            
+                            <form action="{{ route('orders.complete', $order) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow-sm" onclick="return confirm('Apakah Anda yakin paket sudah diterima dengan baik?')">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Pesanan Sudah Saya Terima
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
+                @if($order->status === 'completed')
+                    <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center gap-3">
+                        <i class="bi bi-patch-check-fill fs-1 text-success"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Transaksi Selesai</h6>
+                            <p class="mb-0" style="font-size: 0.9rem;">Terima kasih telah berbelanja di Toko Buku Yusuf Firdaus! Kami tunggu pesanan Anda selanjutnya.</p>
+                        </div>
+                    </div>
+                @endif
+                
+                {{-- Info Pengiriman Mobile ONLY --}}
+                <div class="d-lg-none">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                        <h6 class="fw-bold mb-3">Info Pengiriman</h6>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr><td class="text-muted small">Alamat</td><td class="small fw-semibold">{{ $order->address }}</td></tr>
+                            <tr><td class="text-muted small">Telepon</td><td class="small fw-semibold">{{ $order->phone }}</td></tr>
+                            <tr><td class="text-muted small">Pembayaran</td><td class="small fw-semibold">{{ strtoupper($order->payment_method) }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h6 class="fw-bold mb-3">Info Pengiriman</h6>
+                    <table class="table table-sm table-borderless">
+                        <tr><td class="text-muted small">Alamat</td><td class="small fw-semibold">{{ $order->address }}</td></tr>
+                        <tr><td class="text-muted small">Telepon</td><td class="small fw-semibold">{{ $order->phone }}</td></tr>
+                        <tr><td class="text-muted small">Pembayaran</td><td class="small fw-semibold">{{ strtoupper($order->payment_method) }}</td></tr>
+                        @if($order->shipping_courier)
+                            <tr><td class="text-muted small">Kurir</td><td class="small fw-semibold">{{ $order->shipping_courier }}</td></tr>
+                        @endif
+                        @if($order->tracking_number)
+                            <tr><td class="text-muted small">No. Resi</td><td class="small fw-semibold">{{ $order->tracking_number }}</td></tr>
+                        @endif
+                        @if($order->shipped_at)
+                            <tr><td class="text-muted small">Dikirim</td><td class="small fw-semibold">{{ $order->shipped_at->format('d M Y') }}</td></tr>
+                        @endif
+                        <tr><td class="text-muted small">Tanggal Order</td><td class="small fw-semibold">{{ $order->created_at->format('d M Y H:i') }}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

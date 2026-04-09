@@ -309,8 +309,8 @@
     </div>
 </nav>
 
-{{-- Flash Messages --}}
-@if(session('success'))
+{{-- Flash Messages & Notifications (SweetAlert2) --}}
+@if(session('success') && !session('payment_success') && !session('order_success'))
     <div class="alert alert-success alert-dismissible m-3 shadow-sm" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -384,6 +384,71 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    @if(session('payment_success'))
+        Swal.fire({
+            html: `
+                <div class="text-center mt-2">
+                    <div style="width: 80px; height: 80px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="bi bi-check2 text-success" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Pembayaran Terkirim!</h4>
+                    <p class="text-muted small mb-4">Bukti pembayaran telah kami terima dan sedang diproses oleh admin.</p>
+                    
+                    <div class="text-start bg-light p-3 rounded-4 mb-4" style="border: 1px dashed #cbd5e1;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Status</span>
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Menunggu Konfirmasi</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Total Bayar</span>
+                            <span class="fw-bold text-dark">{{ session('payment_success')['total'] ?? '' }}</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="/orders/{{ session('payment_success')['order_id'] ?? '' }}/invoice" target="_blank" class="btn btn-outline-primary btn-lg rounded-pill fw-bold"><i class="bi bi-receipt me-2"></i>Lihat Struk</a>
+                        <button class="btn btn-success btn-lg rounded-pill fw-bold" onclick="Swal.close()">Lihat Detail Pesanan</button>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: false,
+            customClass: { popup: 'rounded-4 p-4 shadow-lg border-0' }
+        });
+    @endif
+
+    @if(session('order_success'))
+        Swal.fire({
+            html: `
+                <div class="text-center mt-2">
+                    <div style="width: 80px; height: 80px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="bi bi-cart-check text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Pesanan Dibuat!</h4>
+                    <p class="text-muted small mb-4">Yeay! Pesanan Anda berhasil dibuat. Silakan lakukan pembayaran agar bisa segera diproses.</p>
+                    
+                    <div class="text-start bg-light p-3 rounded-4 mb-4" style="border: 1px dashed #cbd5e1;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">No. Pesanan</span>
+                            <span class="fw-bold text-dark">#{{ session('order_success')['order_id'] ?? '' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Total Bayar</span>
+                            <span class="fw-bold text-primary fs-5">{{ session('order_success')['total'] ?? '' }}</span>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-lg rounded-pill fw-bold" onclick="Swal.close()">Lanjut Bayar</button>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: false,
+            customClass: { popup: 'rounded-4 p-4 shadow-lg border-0' }
+        });
+    @endif
+</script>
 
 @stack('scripts')
 </body>

@@ -9,8 +9,25 @@ class Order extends Model
     protected $fillable = [
         'user_id', 'total', 'status', 'address', 'phone',
         'payment_method', 'shipping_courier', 'tracking_number',
-        'shipped_at', 'completed_at'
+        'shipped_at', 'completed_at',
+        'sale_type', 'customer_name', 'amount_paid', 'change_amount'
     ];
+
+    /**
+     * Scope untuk filter transaksi kasir/POS saja.
+     */
+    public function scopePos($query)
+    {
+        return $query->where('sale_type', 'pos');
+    }
+
+    /**
+     * Scope untuk filter transaksi online saja.
+     */
+    public function scopeOnline($query)
+    {
+        return $query->where('sale_type', 'online');
+    }
 
     protected $casts = [
         'shipped_at' => 'datetime',
@@ -34,13 +51,13 @@ class Order extends Model
 
     public function getStatusBadgeAttribute(): string
     {
-        return match($this->status) {
-            'pending'   => '<span class="badge bg-warning text-dark">Menunggu Pembayaran</span>',
+        return match ($this->status) {
+            'pending' => '<span class="badge bg-warning text-dark">Menunggu Pembayaran</span>',
             'confirmed' => '<span class="badge bg-info">Dikonfirmasi</span>',
-            'shipped'   => '<span class="badge bg-primary">Dikirim</span>',
+            'shipped' => '<span class="badge bg-primary">Dikirim</span>',
             'completed' => '<span class="badge bg-success">Selesai</span>',
             'cancelled' => '<span class="badge bg-danger">Dibatalkan</span>',
-            default     => '<span class="badge bg-secondary">' . $this->status . '</span>',
+            default => '<span class="badge bg-secondary">' . $this->status . '</span>',
         };
     }
 

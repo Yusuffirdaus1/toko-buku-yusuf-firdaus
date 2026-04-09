@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('/orders/{order}/payment', [OrderController::class, 'paymentForm'])->name('orders.payment');
     Route::post('/orders/{order}/payment', [OrderController::class, 'uploadPayment'])->name('orders.payment.upload');
 });

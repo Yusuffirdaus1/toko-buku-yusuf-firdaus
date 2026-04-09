@@ -23,7 +23,7 @@ class BookController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%");
+                    ->orWhere('author', 'like', "%{$search}%");
             });
         }
 

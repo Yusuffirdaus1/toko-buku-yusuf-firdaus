@@ -4,54 +4,29 @@
 @section('content')
 {{-- Hero Carousel --}}
 <div class="container mt-4">
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-    <div class="carousel-indicators">
-        @forelse($mainCarousels as $banner)
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}"
-                class="{{ $loop->first ? 'active' : '' }}"></button>
-        @empty
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-        @endforelse
-    </div>
-
-    <div class="carousel-inner">
-        @forelse($mainCarousels as $banner)
-            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                <div style="position: relative; width: 100%; height: clamp(250px, 40vw, 450px);">
-                    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%); z-index: 1;"></div>
-                    <img src="{{ $banner->image_url }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="{{ $banner->title }}">
-                </div>
-                <div class="carousel-caption d-none d-md-block" style="z-index: 2; bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
-                    <h2 class="fw-bold text-white mb-2">{{ $banner->title }}</h2>
-                    @if($banner->description)
-                        <p>{{ $banner->description }}</p>
-                    @endif
-                    @if($banner->link)
-                        <a href="{{ $banner->link }}" class="btn btn-warning fw-bold rounded-pill px-4">Lihat Promo</a>
-                    @endif
-                </div>
+    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    @forelse($mainCarousels->take(1) as $banner)
+        <div style="position: relative; width: 100%; height: clamp(250px, 40vw, 450px);">
+            <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%); z-index: 1;"></div>
+            <img src="{{ $banner->image_url }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="{{ $banner->title }}">
+            <div class="position-absolute d-none d-md-block" style="z-index: 2; bottom: 30px; left: 50%; transform: translateX(-50%); text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+                <h2 class="fw-bold text-white mb-2">{{ $banner->title }}</h2>
+                @if($banner->description)
+                    <p class="text-white">{{ $banner->description }}</p>
+                @endif
             </div>
-        @empty
-            <div class="carousel-item active">
-                <div class="d-flex align-items-center justify-content-center text-white"
-                     style="height: clamp(250px, 40vw, 450px); background: linear-gradient(135deg, #4f46e5, #06b6d4);">
-                    <div class="text-center">
-                        <i class="bi bi-book-half" style="font-size: 4rem;"></i>
-                        <h2 class="fw-bold mt-3">Selamat Datang di Toko Buku</h2>
-                        <p class="fs-5">Temukan buku favorit Anda dengan harga terbaik</p>
-                        <a href="{{ route('books.index') }}" class="btn btn-warning fw-bold rounded-pill px-5 mt-2">Mulai Belanja</a>
-                    </div>
-                </div>
+        </div>
+    @empty
+        <div class="d-flex align-items-center justify-content-center text-white"
+             style="height: clamp(250px, 40vw, 450px); background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+            <div class="text-center">
+                <i class="bi bi-book-half" style="font-size: 4rem;"></i>
+                <h2 class="fw-bold mt-3">Selamat Datang di Toko Buku</h2>
+                <p class="fs-5">Temukan buku favorit Anda dengan harga terbaik</p>
+                <a href="{{ route('books.index') }}" class="btn btn-warning fw-bold rounded-pill px-5 mt-2">Mulai Belanja</a>
             </div>
-        @endforelse
-    </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
+        </div>
+    @endforelse
     </div>
 </div>
 

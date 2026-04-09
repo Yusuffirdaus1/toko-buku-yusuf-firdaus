@@ -172,11 +172,13 @@
                 <p>{{ $order->phone }}</p>
             </div>
             <div class="shipping-to">
-                <h3>Kirim Ke:</h3>
+                <h3>Info Transaksi:</h3>
                 <p><strong>{{ $order->user->name }}</strong></p>
                 <p>{{ $order->address }}</p>
-                <p><strong>Kurir:</strong> {{ $order->shipping_courier ?: 'Belum di update' }}</p>
-                <p><strong>Resi:</strong> {{ $order->tracking_number ?: '-' }}</p>
+                @if($order->payment_method === 'QRIS')
+                    <p><strong>Kurir:</strong> {{ $order->shipping_courier ?: 'Belum di update' }}</p>
+                    <p><strong>Resi:</strong> {{ $order->tracking_number ?: '-' }}</p>
+                @endif
             </div>
         </div>
 
@@ -207,7 +209,7 @@
         <div class="totals">
             <table>
                 <tr>
-                    <th>Subtotal</th>
+                    <th>Total Item</th>
                     <td class="amount">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
@@ -215,9 +217,19 @@
                     <td class="amount" style="text-transform: uppercase;">{{ $order->payment_method }}</td>
                 </tr>
                 <tr class="grand-total">
-                    <th>Total Pembayaran</th>
+                    <th>Total Bayar</th>
                     <td class="amount">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                 </tr>
+                @if($order->payment_method === 'Kasir' && $order->amount_paid)
+                <tr>
+                    <th>Tunai</th>
+                    <td class="amount">Rp {{ number_format($order->amount_paid, 0, ',', '.') }}</td>
+                </tr>
+                <tr style="color: #10b981; font-weight: bold;">
+                    <th>Kembalian</th>
+                    <td class="amount text-success">Rp {{ number_format($order->change_amount, 0, ',', '.') }}</td>
+                </tr>
+                @endif
             </table>
         </div>
         <div class="clear"></div>

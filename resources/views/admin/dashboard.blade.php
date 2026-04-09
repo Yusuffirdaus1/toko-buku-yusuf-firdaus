@@ -30,7 +30,8 @@
             <div class="stat-card" style="background: linear-gradient(135deg,#06b6d4,#22d3ee);">
                 <i class="bi bi-currency-dollar" style="font-size: 1.5rem; opacity: 0.7;"></i>
                 <div class="stat-number mt-1" style="font-size: 1.15rem;">Rp
-                    {{ number_format($stats['revenue'], 0, ',', '.') }}</div>
+                    {{ number_format($stats['revenue'], 0, ',', '.') }}
+                </div>
                 <div class="stat-label">Total Pendapatan</div>
             </div>
         </div>
