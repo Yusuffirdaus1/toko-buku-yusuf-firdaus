@@ -60,7 +60,25 @@ class OrderController extends Controller
             $data['completed_at'] = now();
         }
 
-        $order->update($data);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $order, $data) {
+            // Jika status lama bukan cancelled, tapi status baru adalah cancelled
+            // Maka kita perlu mengembalikan stok buku
+            if ($order->status !== 'cancelled' && $request->status === 'cancelled') {
+                foreach ($order->items as $item) {
+                    $item->book->increment('stock', $item->quantity);
+                }
+            }
+            
+            // Kebalikannya: jika status sebelumnya cancelled, lalu diubah kembali ke status aktif
+            // Maka kita perlu mengurangi stok lagi (tapi ini jarang terjadi, tetap kita handle)
+            if ($order->status === 'cancelled' && in_array($request->status, ['pending', 'confirmed', 'shipped', 'completed'])) {
+                foreach ($order->items as $item) {
+                    $item->book->decrement('stock', $item->quantity);
+                }
+            }
+
+            $order->update($data);
+        });
 
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
     }
