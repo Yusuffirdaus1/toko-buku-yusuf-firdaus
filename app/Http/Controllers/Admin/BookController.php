@@ -85,6 +85,11 @@ class BookController extends Controller
 
     public function destroy(Book $book)
     {
+        // Cek apakah stok buku masih ada
+        if ($book->stock > 0) {
+            return back()->with('error', 'Buku "' . $book->title . '" tidak bisa dihapus karena masih ada stok (stok: ' . $book->stock . '). Kosongkan stok terlebih dahulu.');
+        }
+
         if ($book->cover_image) {
             Storage::disk('public')->delete($book->cover_image);
         }

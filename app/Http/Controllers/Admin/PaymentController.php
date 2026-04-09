@@ -29,21 +29,44 @@ class PaymentController extends Controller
 
     public function confirm(PaymentProof $payment)
     {
-        $payment->update([
-            'status'       => 'confirmed',
-            'confirmed_by' => auth()->id(),
-        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($payment) {
+            $payment->update([
+                'status'       => 'confirmed',
+                'confirmed_by' => auth()->id(),
+            ]);
 
-        $payment->order->update(['status' => 'confirmed']);
+            $order = $payment->order;
+
+            // Jika sebelumnya dibatalkan, kurangi stok lagi karena stok sudah dikembalikan saat batal
+            if ($order->status === 'cancelled') {
+                foreach ($order->items as $item) {
+                    $item->book->decrement('stock', $item->quantity);
+                }
+            }
+
+            $order->update(['status' => 'confirmed']);
+        });
 
         return back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
     }
 
     public function reject(PaymentProof $payment)
     {
-        $payment->update(['status' => 'rejected']);
-        $payment->order->update(['status' => 'pending']);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($payment) {
+            $payment->update(['status' => 'rejected']);
+            
+            $order = $payment->order;
+            
+            // Jika status pesanan belum dibatalkan, kembalikan stok
+            if ($order->status !== 'cancelled') {
+                foreach ($order->items as $item) {
+                    $item->book->increment('stock', $item->quantity);
+                }
+            }
 
-        return back()->with('success', 'Pembayaran ditolak. Pesanan kembali ke status pending.');
+            $order->update(['status' => 'cancelled']);
+        });
+
+        return back()->with('success', 'Pembayaran ditolak. Stok buku telah dikembalikan dan pesanan otomatis dibatalkan.');
     }
 }
