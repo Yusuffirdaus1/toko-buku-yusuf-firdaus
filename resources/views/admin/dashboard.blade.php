@@ -27,31 +27,64 @@
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="stat-card" style="background: linear-gradient(135deg,#06b6d4,#22d3ee);">
-                <i class="bi bi-currency-dollar" style="font-size: 1.5rem; opacity: 0.7;"></i>
+            <div class="stat-card" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
+                <i class="bi bi-shop-window" style="font-size: 1.5rem; opacity: 0.7;"></i>
                 <div class="stat-number mt-1" style="font-size: 1.15rem;">Rp
-                    {{ number_format($stats['revenue'], 0, ',', '.') }}
+                    {{ number_format($stats['pos_revenue_today'], 0, ',', '.') }}
                 </div>
-                <div class="stat-label">Total Pendapatan</div>
+                <div class="stat-label">POS Hari Ini</div>
             </div>
         </div>
     </div>
 
     {{-- Alert Badges --}}
-    @if($stats['pending_orders'] > 0)
+    @if($stats['pending_orders'] > 0 || $stats['pending_kasir'] > 0)
         <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="text-decoration-none">
-                    <div class="card border-0 shadow-sm rounded-3 p-3 border-start border-warning border-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-warning text-dark fs-5">{{ $stats['pending_orders'] }}</span>
-                            <span class="fw-semibold small">Pesanan Pending</span>
+            @if($stats['pending_kasir'] > 0)
+                <div class="col-md-4">
+                    <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 p-3 border-start border-danger border-4" style="background: #fff5f5;">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger fs-5">{{ $stats['pending_kasir'] }}</span>
+                                <div class="flex-grow-1">
+                                    <span class="fw-bold text-danger d-block small">PEMBERITAHUAN KASIR</span>
+                                    <span class="text-muted" style="font-size: 0.72rem;">Ada pembayar tunai di toko!</span>
+                                </div>
+                                <i class="bi bi-bell-fill text-danger animate-bounce"></i>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
+            @endif
+
+            @if($stats['pending_orders'] > $stats['pending_kasir'])
+                <div class="col-md-4">
+                    <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 p-3 border-start border-warning border-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark fs-5">{{ $stats['pending_orders'] - $stats['pending_kasir'] }}</span>
+                                <div class="flex-grow-1">
+                                    <span class="fw-bold text-dark d-block small">PESANAN ONLINE</span>
+                                    <span class="text-muted" style="font-size: 0.72rem;">Menunggu konfirmasi QRIS.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endif
         </div>
     @endif
+
+    {{-- CSS for Animation --}}
+    <style>
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce {
+            animation: bounce 0.8s infinite;
+        }
+    </style>
 
     <div class="row g-4">
         {{-- Recent Orders --}}

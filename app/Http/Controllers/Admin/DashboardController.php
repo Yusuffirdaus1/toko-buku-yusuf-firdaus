@@ -19,7 +19,9 @@ class DashboardController extends Controller
             'categories' => Category::count(),
             'orders' => Order::count(),
             'pending_orders' => Order::where('status', 'pending')->count(),
+            'pending_kasir' => Order::where('status', 'pending')->where('payment_method', 'Kasir')->count(),
             'revenue' => Order::whereIn('status', ['confirmed', 'shipped', 'completed'])->sum('total'),
+            'pos_revenue_today' => Order::pos()->where('status', 'completed')->whereDate('created_at', now())->sum('total'),
         ];
 
         $recentOrders = Order::with('user')->latest()->take(10)->get();
